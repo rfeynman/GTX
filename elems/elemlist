@@ -1,0 +1,50 @@
+# List all your elements below as follows
+#
+# Name1       Filename1
+# Name2       Filename2
+# ...
+
+#settstack              sources/Start/settstack
+#spacecharge3Dmeshxz    sources/SC2/sc3dmeshxz
+#setqscale              sources/Start/setqscale
+#setxscale              sources/Start/setxscale
+#setyscale              sources/Start/setyscale
+#settscale              sources/Start/settscale
+#setxzarc               sources/Start/setxzarc
+setxoffset              setxoffset
+setyoffset              setyoffset
+#setrdip                sources/Start/setrdip
+#settdip                sources/Start/settdip
+#settransformt          sources/Start/settranst
+#setrfile               sources/Start/setrfile
+#settfile               sources/Start/settfile
+#setxyfile              sources/Start/setxyfile
+#setttail               sources/Start/setttail
+#map3D_EB               sources/Maps/map3D_EB
+#map3D_Ecomplex         sources/Maps/map3D_Ecomplex
+#map3D_Hcomplex         sources/Maps/map3D_Hcomplex
+#quadrupolefringe       sources/BStatic/quadfringe
+#map1D_Brectmag         sources/Maps/map1D_Brectmag
+#map1D_Bquad            sources/Maps/map1D_Bquad
+GBzmin			GBzmin
+#quad_lim		sources/BStatic/quad_lim
+#rectmagnet             sources/BStatic/rectmagnet
+#sectormagnet           sources/BStatic/sectormagnet
+#sectormagnetwcs        sources/BStatic/sectormagnetwcs
+#bzsolenoidO3           sources/BStatic/bzsolenoidO3
+#spacecharge3DmeshSchottky sources/SC/sc3dmeshSchottky
+boxsolenoid		boxsolenoid
+sectormagnet_fix	sectormagnet_fix
+map3D3Sym_B		map3D3Sym_B
+uturn			uturn
+dogleg			dogleg
+myquad			myquad
+kasten			kasten
+csol			csol
+cathode			cathode
+multirmax		multirmax
+ionizer			ionizer
+timesetfile		timesetfile
+onAxis			onAxis
+catleg			catleg
+catdog			catdog

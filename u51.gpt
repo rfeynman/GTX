@@ -1,0 +1,977 @@
+#--------------------------------------------------------------------------
+# BNL Injector 6/22
+# 
+#--------------------------------------------------------------------------
+
+
+GPTLICENSE =1233690964;
+
+pp("section", section);
+#xsections 1  3
+#xsections  3 6
+#xsections  1  4
+#@sections  5  
+#xsections -1
+
+outputvalue("coolEnergy", 1.6e6);
+
+#xvar  dogfield      1e-6       -10000 10000   dogfield
+#@var  catfield      1e-4       -10000 10000   dogfield
+#xvar  sol13Field    5e-6       -10000 10000   dogsol
+
+#xvar  uturnfield    5e-6       -10000 10000   uturnfield
+#xvar  sol24Field    1e-6       -10000 10000   second cooling section
+
+#xvar  boosterPhase  1e-2       -10000 10000   booster phase
+#xvar  boosterAmpl   1e-3       -10000 10000   booster amplitude
+#xvar  thirdPhase    1e-2       -10000 10000   3rd phase
+#xvar  thirdAmpl     5e-3       -10000 10000   3rd amplitude
+#xvar  sevenWPhase   1e-2       -10000 10000   700w phase
+#xvar  sevenWAmpl    5e-3       -10000 10000   700w amplitude
+
+
+#xvar  hcorr00       2e-5       -10000 10000   injection sol 1 h corr
+#xvar  vcorr00       2e-5       -10000 10000   injection sol 1 v corr
+#xvar  hcorr01       2e-5       -10000 10000   injection sol 2 h corr
+#xvar  vcorr01       2e-5       -10000 10000   injection sol 2 v corr
+
+#xvar  qcorr00       2e-5       -10000 10000   injection sol 1 nq corr
+#xvar  sqcorr00      2e-5       -10000 10000   injection sol 1 sq corr
+#xvar  qcorr01       2e-5       -10000 10000   injection sol 2 nq corr
+#xvar  sqcorr01      2e-5       -10000 10000   injection sol 2 sq corr
+
+#xvar  sol00Field    5e-6       -10000 10000   injection sol 1 bs
+#xvar  sol01Field    5e-6       -10000 10000   injection sol 2 bs
+
+#xvar  gcxField      5e-6       -10000 10000   gun corr h
+#xvar  gcyField      5e-6       -10000 10000   gun corr v
+
+#xvar  sol12Field    2e-6       -10000 10000   sole before dogleg
+#xvar  quad01Field   1e-3       -10000 10000   quad bfore  dogleg
+#xvar  quad02Field   1e-3       -10000 10000   quad after  dogleg
+#xvar  sol15Field    2e-6       -10000 10000   sole after  dogleg
+#xvar  sol16Field    1e-6       -10000 10000   first  cooling section
+
+#xvar  sol05Field       1e-6       -10000 10000   booster phase
+#xvar  sol06Field       1e-6       -10000 10000   booster phase
+#xvar  sol07Field       1e-6       -10000 10000   booster phase
+#xvar  sol08Field       1e-6       -10000 10000   booster phase
+#xvar  sol09Field       1e-6       -10000 10000   booster phase
+#xvar  sol10Field       1e-6       -10000 10000   booster phase
+#xvar  sol11Field       1e-6       -10000 10000   booster phase
+#xvar  sol12Field       1e-6       -10000 10000   booster phase
+#xvar  sol15Field       1e-6       -10000 10000   booster phase
+#xvar  sol16Field       1e-6       -10000 10000   booster phase
+
+#--------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------
+# ACCURACY AND INTEGRATION PARAMETERS
+#--------------------------------------------------------------------------
+RadiusMax = 0.04;
+# Warning: 2000 particles is converged in B1 section only with GBacc > 5.5
+GBacc =  5.5;
+xacc  =  6.5;
+accuracy(GBacc, xacc);
+dtmin = 1e-16;
+dtmax = 1e-10;   # orig
+#--------------------------------------------------------------------------
+
+
+#--------------------------------------------------------------------------
+# SWITCHES:
+#--------------------------------------------------------------------------
+
+total_charge = -130e-12;
+space_charge = 1;
+space_charge_type = 1;
+mc2 = m*c*c/abs(qe);
+Ekin = 0.4;	# kinetic energy out of the cathode
+Gamma  = 1+Ekin/mc2 ;
+Alpha  = 1.2;   # 1.2    (manual default is 1.0), (bigger is better)
+Fn     = 0.25;  # 0.25   (manual default is 0.5), (smaller is better)
+verror = 0.005; # 0.005  (manual default is 0.01), (smaller is better)
+Nstd   = 12;    # 12     (manual default is 5), (bigger is better)
+Npart = 1000;
+
+
+
+dosave =  0;
+
+
+
+#-----------------------------------------------------------------------
+# ELEMENTS:
+#-----------------------------------------------------------------------
+# DC GUN
+gun_voltage= 400;
+Zdcgun = 0.15;
+Maxdcgun  = 500.0;
+Edcgun    = gun_voltage / Maxdcgun;
+Map2D_E("wcs", "z", Zdcgun, "/home/jorg/LowEnergyCooling/GPT_cornell/fieldmaps/dcgun_GHV.gdf", "R", "Z", "Er", "Ez", Edcgun);
+
+
+
+#------------------------
+# RF CAVITIES:
+#------------------------
+boosterPhase =     3.4043650464e+00  ;
+boosterAmpl =     6.3862306794e+00  ;
+RF_freq = 703.75e6  ;
+
+thirdPhase =     4.4063386100e+00  ;
+thirdAmpl =     7.3439206210e-01  ;
+
+ninePhase=   2.61819807502  ;
+nineAmpl= 0  ;
+
+sevenWPhase =     4.6984533250e+00  ;
+sevenWAmpl =     2.5926576090e-01  ;
+
+
+
+
+#------------------------
+# Dipoles
+#------------------------
+
+dogfield =     3.6900549496e-05  ;
+
+catfield =     9.4345506343e-03 ;
+catdl=  -2.3085475e-02 ;
+catb1 = 5.1015937e+01 ;
+catb2 = 1.7411368e+01 ;
+w20=20.*pi/180;
+
+uturnfield =    -3.7099406767e-05  ;
+
+
+
+
+
+
+hcorr00=   0     ;
+vcorr00=   0     ;
+hcorr01=   0     ;
+vcorr01=   0     ;
+
+qcorr00=    0       ;
+sqcorr00=   0       ;
+qcorr01=    0       ;
+sqcorr01=   0       ;
+
+sol00Field=  7.3665572353e-05   ;
+sol01Field=  6.5056101736e-05   ;
+
+
+#-----------------------------------------------------------------------
+sol02Field= 9.077415e-06 ;
+sol03Field= 2.480068e-05 ;
+sol04Field= 2.736146e-05 ;
+sol05Field =     4.0185935197e-05  ;
+sol06Field =     1.8451943693e-05  ;
+sol07Field =     1.9999104918e-05  ;
+#sol08Field= 1.5000000-06 ;
+sol08Field =    -6.0966082155e-07  ;
+#9 Mhz
+sol09Field =     3.3595462645e-05  ;
+sol10Field =     2.7708258407e-05  ;
+sol11Field =     2.4652257933e-05  ;
+
+#sol08Field= 1.115815e-06 ;
+#quad00Field= 0.000000e+00 ;
+#sol09Field= 2.139347e-05 ;
+#sol10Field= 2.139347e-05 ;
+#sol11Field= 2.139347e-05 ;
+
+
+
+
+sol12Field =     4.2325959162e-05  ;
+quad01Field =     0  ;
+sol13Field =     3.9680763572e-05  ;
+sol14Field= -sol13Field ;
+quad02Field =     0  ;
+sol15Field =     2.6511494726e-05  ;
+
+#sol16Field =     5.2446388261e-05  ;
+sol16Field =     3.7309082410e-05  ;
+sol17Field= sol16Field ;
+sol18Field= sol16Field ;
+sol19Field= sol16Field ;
+sol20Field= sol16Field ;
+sol21Field= sol16Field ;
+
+sol22Field= 7.691104e-05 ;
+quad03Field= -2.789656e-03 ;
+quad04Field= -2.005807e-02 ;
+sol23Field= 5.870056e-05 ;
+sol24Field= 2.979759e-05 ;
+
+#sol22Field= 2.939507e-05 ;
+#quad03Field= 0 ;
+#quad04Field= 0 ;
+#sol23Field= 0 ;
+#sol24Field= 0 ;
+
+sol25Field= sol24Field ;
+sol26Field= sol24Field ;
+sol27Field= sol24Field ;
+sol28Field= sol24Field ;
+sol29Field= sol24Field ;
+sol30Field= sol24Field ;
+sol31Field= 1.496526e-04 ;
+quad05Field= -3.000000e-02 ;
+quad06Field= 3.000000e-01 ;
+quad07Field= 0.000000e+00 ;
+quad08Field= 0.000000e+00 ;
+quad09Field= 0.000000e+00 ;
+quad10Field= 0.000000e+00 ;
+quad11Field= 0.000000e+00 ;
+quad12Field= 0.000000e+00 ;
+quad13Field= 0.000000e+00 ;
+quad14Field= 0.000000e+00 ;
+quad15Field= 0.000000e+00 ;
+quad16Field= 0.000000e+00 ;
+quad17Field= 0.000000e+00 ;
+quad18Field= 0.000000e+00 ;
+quad19Field= 0.000000e+00 ;
+quad20Field= 0.000000e+00 ;
+quad21Field= 0.000000e+00 ;
+quad22Field= 0.000000e+00 ;
+quad23Field= 0.000000e+00 ;
+quad24Field= 0.000000e+00 ;
+quad25Field= 0.000000e+00 ;
+quad26Field= 0.000000e+00 ;
+quad27Field= 0.000000e+00 ;
+quad28Field= 0.000000e+00 ;
+quad29Field= 0.000000e+00 ;
+quad30Field= 0.000000e+00 ;
+quad31Field= 0.000000e+00 ;
+quad32Field= 0.000000e+00 ;
+quad33Field= 0.000000e+00 ;
+quad34Field= 0.000000e+00 ;
+quad35Field= 0.000000e+00 ;
+quad36Field= 0.000000e+00 ;
+quad37Field= 0.000000e+00 ;
+quad38Field= 0.000000e+00 ;
+quad39Field= 0.000000e+00 ;
+quad40Field= 0.000000e+00 ;
+quad41Field= 0.000000e+00 ;
+quad42Field= 0.000000e+00 ;
+quad43Field= 0.000000e+00 ;
+quad44Field= 0.000000e+00 ;
+quad45Field= 0.000000e+00 ;
+#-----------------------------------------------------------------------
+
+gcxField = 0 ;
+gcyField = 0 ;
+rectmagnet("wcs",    0,0,0.1,  1,0,0,   0,1,0,            0.1,   0.1, gcxField,   0,   1./0.05,  0);
+rectmagnet("wcs",    0,0,0.1,  0,1,0,  -1,0,0,            0.1,   0.1, gcyField,   0,   1./0.05,  0);
+
+
+#-----------------------------------------------------------------------
+#(ECS,mapfile, solfactor, hdipfactor, vdipfactor, quadfactor, skewfactor)
+      csol("wcs", "z", 0.338200 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/GUN_SOLENOID/Fe_map_Jan_2016.bin", sol00Field, hcorr00, vcorr00, qcorr00, sqcorr00);
+    kasten("wcs", "z", 0.338200 , 0.124000, 0.150000);
+      csol("wcs", "z", 0.909624 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/GUN_SOLENOID/Fe_map_Jan_2016.bin", sol01Field, hcorr01, vcorr01, qcorr01, sqcorr01);
+    kasten("wcs", "z", 0.909624 , 0.124000, 0.150000);
+ Map25D_TM("wcs", "z", 1.676696 , "/home/jorg/LowEnergyCooling/GPT_cornell/fieldmaps/NOCATH.gdf",  "R", "Z", "Er", "Ez", "H", boosterAmpl, 0, boosterPhase, 2*pi*RF_freq);
+    kasten("wcs", "z", 1.676696 , 0.050000, 0.100000, "#cav");
+ Map25D_TM("wcs", "z", 3.316609 , "/home/jorg/LowEnergyCooling/Dima/Superfish/T2100X.gdf",  "R", "Z", "Er", "Ez", "H", thirdAmpl, 0, thirdPhase, 2*pi*3.*RF_freq);
+    kasten("wcs", "z", 3.316609 , 0.146000, 0.100000, "#cav");
+   map1D_B("wcs", "z", 3.889967 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/ERLsolenoid/ERLsole_2_field.gdf", "z", "Bz",sol02Field);
+    kasten("wcs", "z", 3.889967 , 0.110000, 0.150000);
+   map1D_B("wcs", "z", 5.969465 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/ERLsolenoid/ERLsole_2_field.gdf", "z", "Bz",sol03Field);
+    kasten("wcs", "z", 5.969465 , 0.110000, 0.150000);
+   map1D_B("wcs", "z", 8.642573 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/TRANSPORT_SOLENOID/trans_sole_eng_map.gdf", "z", "Bz",sol04Field);
+    kasten("wcs", "z", 8.642573 , 0.298000, 0.150000);
+   map1D_B("wcs", "z", 14.192543 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/TRANSPORT_SOLENOID/trans_sole_eng_map.gdf", "z", "Bz",sol05Field);
+    kasten("wcs", "z", 14.192543 , 0.298000, 0.150000);
+   map1D_B("wcs", "z", 16.865043 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/TRANSPORT_SOLENOID/trans_sole_eng_map.gdf", "z", "Bz",sol06Field);
+    kasten("wcs", "z", 16.865043 , 0.298000, 0.150000);
+   map1D_B("wcs", "z", 19.539412 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/TRANSPORT_SOLENOID/trans_sole_eng_map.gdf", "z", "Bz",sol07Field);
+    kasten("wcs", "z", 19.539412 , 0.298000, 0.150000);
+   map1D_B("wcs", "z", 23.288206 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/TRANSPORT_SOLENOID/trans_sole_eng_map.gdf", "z", "Bz",sol08Field);
+    kasten("wcs", "z", 23.288206 , 0.298000, 0.150000);
+ Map25D_TM("wcs", "z", 25.117021 , "/home/jorg/LowEnergyCooling/Dima/Superfish/9MHZPI.gdf",  "R", "Z", "Er", "Ez", "H", nineAmpl, 0, ninePhase, 2*pi*RF_freq/75.);
+    kasten("wcs", "z", 25.117021 , 0.160000, 0.050000, "#quad");
+   map1D_B("wcs", "z", 26.813225 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/TRANSPORT_SOLENOID/trans_sole_eng_map.gdf", "z", "Bz",sol09Field);
+    kasten("wcs", "z", 26.813225 , 0.298000, 0.150000);
+   map1D_B("wcs", "z", 30.333225 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/TRANSPORT_SOLENOID/trans_sole_eng_map.gdf", "z", "Bz",sol10Field);
+    kasten("wcs", "z", 30.333225 , 0.298000, 0.150000);
+   map1D_B("wcs", "z", 33.858225 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/TRANSPORT_SOLENOID/trans_sole_eng_map.gdf", "z", "Bz",sol11Field);
+    kasten("wcs", "z", 33.858225 , 0.298000, 0.150000);
+ Map25D_TM("wcs", "z", 36.506325 , "/home/jorg/LowEnergyCooling/Dima/Superfish/W704MH.gdf",  "R", "Z", "Er", "Ez", "H", sevenWAmpl, 0, sevenWPhase, 2*pi*RF_freq);
+    kasten("wcs", "z", 36.506325 , 0.156000, 0.100000, "#cav");
+   map1D_B("wcs", "z", 37.405279 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/ERLsolenoid/ERLsole_2_field.gdf", "z", "Bz",sol12Field);
+    kasten("wcs", "z", 37.405279 , 0.088000, 0.150000);
+quadrupole("wcs", "z", 37.516779 , 0.050000, quad01Field);
+    kasten("wcs", "z", 37.516779 , 0.050000, 0.050000, "#quad");
+
+#  gpterror( "Syntax: %s(fromaxis, toaxis, arclength, angle, Bfield, phi_in, phi_out, dl, b1, b2, flipx)\n", gptgetname(init) ) ;
+
+       ccs("wcs", -13.317544, 0.000000, 2.351326,      9.396926e-01,  0.000000e+00,  -3.420201e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, "ccs1");
+    catleg("wcs",  0.013057, 0.000000, 38.938675,      9.848078e-01,  0.000000e+00,  -1.736482e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, "ccs1",
+   	 catfield, 0.3, -w20,  -w20/4, -w20/4, catdl, catb1, catb2, 1);
+    kasten("wcs",  0.013057, 0.000000, 38.938675,      9.848078e-01,  0.000000e+00,  -1.736482e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, 0.300000 , 0.200000, "dogleg");
+   map1D_B("ccs1", "z", 40.139435 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/MATCHING_SOLENOID/matching_sole_map.gdf", "z", "Bz",sol13Field);
+    kasten("ccs1", "z", 40.139435 , 0.208000, 0.150000);
+   map1D_B("ccs1", "z", 42.239435 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/MATCHING_SOLENOID/matching_sole_map.gdf", "z", "Bz",sol14Field);
+    kasten("ccs1", "z", 42.239435 , 0.208000, 0.150000);
+       ccs("ccs1", 14.856634, 0.000000, 2.622709,      9.396926e-01,  0.000000e+00,  3.420201e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, "ccs2");
+    catleg("ccs1",  -0.013057, 0.000000, 43.438675,      9.848078e-01,  0.000000e+00,  1.736482e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, "ccs2",
+    	catfield, 0.3, -w20,  -w20/4, -w20/4, catdl, catb1, catb2, 0);
+    kasten("ccs1",  -0.013057, 0.000000, 43.438675,      9.848078e-01,  0.000000e+00,  1.736482e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, 0.300000 , 0.200000, "dogleg");
+
+
+
+quadrupole("ccs2", "z", 44.447813 , 0.050000, quad02Field);
+    kasten("ccs2", "z", 44.447813 , 0.050000, 0.050000, "#quad");
+   map1D_B("ccs2", "z", 44.607813 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/MATCHING_SOLENOID/matching_sole_map.gdf", "z", "Bz",sol15Field);
+    kasten("ccs2", "z", 44.607813 , 0.208000, 0.150000);
+   map1D_B("ccs2", "z", 47.635237 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol16Field);
+    kasten("ccs2", "z", 47.635237 , 0.124000, 0.150000);
+   map1D_B("ccs2", "z", 50.662661 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol17Field);
+    kasten("ccs2", "z", 50.662661 , 0.124000, 0.150000);
+   map1D_B("ccs2", "z", 53.690085 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol18Field);
+    kasten("ccs2", "z", 53.690085 , 0.124000, 0.150000);
+   map1D_B("ccs2", "z", 56.717509 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol19Field);
+    kasten("ccs2", "z", 56.717509 , 0.124000, 0.150000);
+   map1D_B("ccs2", "z", 59.744933 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol20Field);
+    kasten("ccs2", "z", 59.744933 , 0.124000, 0.150000);
+   map1D_B("ccs2", "z", 62.772357 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol21Field);
+    kasten("ccs2", "z", 62.772357 , 0.124000, 0.150000);
+   map1D_B("ccs2", "z", 65.783291 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol22Field);
+    kasten("ccs2", "z", 65.783291 , 0.208000, 0.150000);
+quadrupole("ccs2", "z", 66.508291 , 0.050000, quad03Field);
+    kasten("ccs2", "z", 66.508291 , 0.050000, 0.050000, "#quad");
+       ccs("ccs2", 1.200594, 0.000000, 134.431082,      -9.999727e-01,  0.000000e+00,  7.382676e-03,     0.000000e+00,  1.000000e+00,  0.000000e+00, "ccs3");
+     uturn("ccs2",  0.351031, 0.000000, 66.945167,      9.999932e-01,  0.000000e+00,  -3.691363e-03,     0.000000e+00,  1.000000e+00,  0.000000e+00, "/home/jorg/LowEnergyCooling/GPT/uturn/180-deg_dipole_map.bin",  uturnfield, "ccs3");
+    kasten("ccs2",  0.351031, 0.000000, 66.945167,      9.999932e-01,  0.000000e+00,  -3.691363e-03,     0.000000e+00,  1.000000e+00,  0.000000e+00, 0.560000 , 0.700000, "uturn");
+quadrupole("ccs3", "z", 67.927223 , 0.050000, quad04Field);
+    kasten("ccs3", "z", 67.927223 , 0.050000, 0.050000, "#quad");
+   map1D_B("ccs3", "z", 68.652223 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol23Field);
+    kasten("ccs3", "z", 68.652223 , 0.124000, 0.150000);
+   map1D_B("ccs3", "z", 71.663157 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol24Field);
+    kasten("ccs3", "z", 71.663157 , 0.124000, 0.150000);
+   map1D_B("ccs3", "z", 74.690581 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol25Field);
+    kasten("ccs3", "z", 74.690581 , 0.124000, 0.150000);
+   map1D_B("ccs3", "z", 77.718005 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol26Field);
+    kasten("ccs3", "z", 77.718005 , 0.124000, 0.150000);
+   map1D_B("ccs3", "z", 80.745429 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol27Field);
+    kasten("ccs3", "z", 80.745429 , 0.124000, 0.150000);
+   map1D_B("ccs3", "z", 83.772853 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol28Field);
+    kasten("ccs3", "z", 83.772853 , 0.124000, 0.150000);
+   map1D_B("ccs3", "z", 86.800277 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol29Field);
+    kasten("ccs3", "z", 86.800277 , 0.124000, 0.150000);
+   map1D_B("ccs3", "z", 89.827701 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol30Field);
+    kasten("ccs3", "z", 89.827701 , 0.124000, 0.150000);
+       ccs("ccs3", 31.139073, 0.000000, 5.493742,      9.396926e-01,  0.000000e+00,  3.420201e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, "ccs4");
+    #dogleg("ccs3",  -0.013057, 0.000000, 91.045339,      9.848078e-01,  0.000000e+00,  1.736482e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, "/home/jorg/LowEnergyCooling/GPT/uturn/20_deg_dipole_map.bin", -dogfield, 0, "ccs4");
+    kasten("ccs3",  -0.013057, 0.000000, 91.045339,      9.848078e-01,  0.000000e+00,  1.736482e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, 0.300000 , 0.200000, "dogleg");
+   map1D_B("ccs4", "z", 93.346099 , "/home/jorg/LowEnergyCooling/Dima/realSolenoidField/COMPENSATING_SOLENOID/compensating_sole_map.gdf", "z", "Bz",sol31Field);
+    kasten("ccs4", "z", 93.346099 , 0.100000, 0.150000);
+       ccs("ccs4", -32.678163, 0.000000, 5.765126,      9.396926e-01,  0.000000e+00,  -3.420201e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, "ccs5");
+    #dogleg("ccs4",  0.013057, 0.000000, 95.545339,      9.848078e-01,  0.000000e+00,  -1.736482e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, "/home/jorg/LowEnergyCooling/GPT/uturn/20_deg_dipole_map.bin", -dogfield, 1, "ccs5");
+    kasten("ccs4",  0.013057, 0.000000, 95.545339,      9.848078e-01,  0.000000e+00,  -1.736482e-01,     0.000000e+00,  1.000000e+00,  0.000000e+00, 0.300000 , 0.200000, "dogleg");
+quadrupole("ccs5", "z", 95.846099 , 0.100000, quad05Field);
+    kasten("ccs5", "z", 95.846099 , 0.100000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.046099 , 0.200000, quad06Field);
+    kasten("ccs5", "z", 99.046099 , 0.200000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.232499 , 0.016800, quad07Field);
+    kasten("ccs5", "z", 99.232499 , 0.016800, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.290899 , 0.100000, quad08Field);
+    kasten("ccs5", "z", 99.290899 , 0.100000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.365899 , 0.050000, quad09Field);
+    kasten("ccs5", "z", 99.365899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.415899 , 0.050000, quad10Field);
+    kasten("ccs5", "z", 99.415899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.465899 , 0.050000, quad11Field);
+    kasten("ccs5", "z", 99.465899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.515899 , 0.050000, quad12Field);
+    kasten("ccs5", "z", 99.515899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.565899 , 0.050000, quad13Field);
+    kasten("ccs5", "z", 99.565899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.615899 , 0.050000, quad14Field);
+    kasten("ccs5", "z", 99.615899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.665899 , 0.050000, quad15Field);
+    kasten("ccs5", "z", 99.665899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.715899 , 0.050000, quad16Field);
+    kasten("ccs5", "z", 99.715899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.765899 , 0.050000, quad17Field);
+    kasten("ccs5", "z", 99.765899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.815899 , 0.050000, quad18Field);
+    kasten("ccs5", "z", 99.815899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.865899 , 0.050000, quad19Field);
+    kasten("ccs5", "z", 99.865899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.915899 , 0.050000, quad20Field);
+    kasten("ccs5", "z", 99.915899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 99.965899 , 0.050000, quad21Field);
+    kasten("ccs5", "z", 99.965899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.015899 , 0.050000, quad22Field);
+    kasten("ccs5", "z", 100.015899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.065899 , 0.050000, quad23Field);
+    kasten("ccs5", "z", 100.065899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.115899 , 0.050000, quad24Field);
+    kasten("ccs5", "z", 100.115899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.165899 , 0.050000, quad25Field);
+    kasten("ccs5", "z", 100.165899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.215899 , 0.050000, quad26Field);
+    kasten("ccs5", "z", 100.215899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.265899 , 0.050000, quad27Field);
+    kasten("ccs5", "z", 100.265899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.315899 , 0.050000, quad28Field);
+    kasten("ccs5", "z", 100.315899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.365899 , 0.050000, quad29Field);
+    kasten("ccs5", "z", 100.365899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.415899 , 0.050000, quad30Field);
+    kasten("ccs5", "z", 100.415899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.465899 , 0.050000, quad31Field);
+    kasten("ccs5", "z", 100.465899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.515899 , 0.050000, quad32Field);
+    kasten("ccs5", "z", 100.515899 , 0.050000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.569899 , 0.058000, quad33Field);
+    kasten("ccs5", "z", 100.569899 , 0.058000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.608899 , 0.020000, quad34Field);
+    kasten("ccs5", "z", 100.608899 , 0.020000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.628899 , 0.020000, quad35Field);
+    kasten("ccs5", "z", 100.628899 , 0.020000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.648899 , 0.020000, quad36Field);
+    kasten("ccs5", "z", 100.648899 , 0.020000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.668899 , 0.020000, quad37Field);
+    kasten("ccs5", "z", 100.668899 , 0.020000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.688899 , 0.020000, quad38Field);
+    kasten("ccs5", "z", 100.688899 , 0.020000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.708899 , 0.020000, quad39Field);
+    kasten("ccs5", "z", 100.708899 , 0.020000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.728899 , 0.020000, quad40Field);
+    kasten("ccs5", "z", 100.728899 , 0.020000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.748899 , 0.020000, quad41Field);
+    kasten("ccs5", "z", 100.748899 , 0.020000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.768899 , 0.020000, quad42Field);
+    kasten("ccs5", "z", 100.768899 , 0.020000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.788899 , 0.020000, quad43Field);
+    kasten("ccs5", "z", 100.788899 , 0.020000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.808899 , 0.020000, quad44Field);
+    kasten("ccs5", "z", 100.808899 , 0.020000, 0.050000, "#quad");
+quadrupole("ccs5", "z", 100.828899 , 0.020000, quad45Field);
+    kasten("ccs5", "z", 100.828899 , 0.020000, 0.050000, "#quad");
+#-----------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+#-----------------------------------------------------------------------
+screen("wcs", "I", 0.000000 , "wcs");
+screen("wcs", "I", 0.036396 , "wcs");
+screen("wcs", "I", 0.086396 , "wcs");
+screen("wcs", "I", 0.136396 , "wcs");
+screen("wcs", "I", 0.186396 , "wcs");
+screen("wcs", "I", 0.236396 , "wcs");
+screen("wcs", "I", 0.286396 , "wcs");  # s0
+screen("wcs", "I", 0.486396 , "wcs");
+screen("wcs", "I", 0.586396 , "wcs");
+screen("wcs", "I", 0.686396 , "wcs");  # s1
+screen("wcs", "I", 0.886396 , "wcs");
+screen("wcs", "I", 0.936396 , "wcs");
+screen("wcs", "I", 1.036396 , "wcs");
+outputvalue("loc1", 1.036396);
+#xgoal loc1   n 0  orbx  0  1 0  orby   0 1 0
+screen("wcs", "I", 1.136396 , "wcs");
+screen("wcs", "I", 1.236396 , "wcs");
+screen("wcs", "I", 1.310696 , "wcs");
+screen("wcs", "I", 1.410696 , "wcs");
+outputvalue("loc2", 1.410696);
+#xgoal loc2   n 0  orbx  0 1  0 orby   0 1 0
+screen("wcs", "I", 1.486696 , "wcs");  # c0
+screen("wcs", "I", 1.963861 , "wcs");
+screen("wcs", "I", 2.103861 , "wcs");
+screen("wcs", "I", 2.403861 , "wcs");
+screen("wcs", "I", 2.694261 , "wcs");
+screen("wcs", "I", 2.835461 , "wcs");  # c0
+outputvalue("here3", 2.835461);
+#xgoal here3   n 0  ener  100000 1 0
+screen("wcs", "I", 3.325817 , "wcs");  # s2
+screen("wcs", "I", 3.742317 , "wcs");
+screen("wcs", "I", 3.834967 , "wcs");
+screen("wcs", "I", 4.042317 , "wcs");
+if( 1)
+{
+screen("wcs", "I", 4.368157 , "wcs");
+screen("wcs", "I", 4.461815 , "wcs");
+screen("wcs", "I", 4.761815 , "wcs");
+screen("wcs", "I", 5.061815 , "wcs");
+screen("wcs", "I", 5.405315 , "wcs");  # s3
+screen("wcs", "I", 5.821815 , "wcs");
+outputvalue("here1", 6.002465e+00);
+#xgoal here1   n 0  envx  3.662907e-03   10 0 
+#xgoal here1   n 0  envy  3.662907e-03   10 0
+screen("wcs", "I", 6.002465e+00 , "wcs");
+screen("wcs", "I", 6.121815 , "wcs");
+screen("wcs", "I", 6.170803 , "wcs");
+screen("wcs", "I", 6.262923 , "wcs");
+screen("wcs", "I", 6.562923 , "wcs");
+screen("wcs", "I", 6.862923 , "wcs");
+screen("wcs", "I", 7.162923 , "wcs");
+screen("wcs", "I", 7.462923 , "wcs");
+screen("wcs", "I", 7.762923 , "wcs");
+screen("wcs", "I", 7.988788 , "wcs");  # s4
+screen("wcs", "I", 8.464918 , "wcs");
+screen("wcs", "I", 8.664918 , "wcs");
+screen("wcs", "I", 8.964918 , "wcs");
+screen("wcs", "I", 9.264918 , "wcs");
+screen("wcs", "I", 9.630398 , "wcs");
+screen("wcs", "I", 9.943398 , "wcs");
+outputvalue("tran1", 9.943398);
+#xgoal tran1   n 0  epsx_n  0   10 0 epsy_n  0   10 0
+screen("wcs", "I", 10.256398 , "wcs");
+screen("wcs", "I", 10.569398 , "wcs");
+screen("wcs", "I", 10.882398 , "wcs");
+screen("wcs", "I", 11.195398 , "wcs");
+screen("wcs", "I", 11.514898 , "wcs");
+screen("wcs", "I", 11.814898 , "wcs");
+screen("wcs", "I", 12.114898 , "wcs");
+screen("wcs", "I", 12.499398 , "wcs");
+screen("wcs", "I", 12.810398 , "wcs");
+screen("wcs", "I", 13.160398 , "wcs");
+screen("wcs", "I", 13.538763 , "wcs");  # s5
+screen("wcs", "I", 14.151263 , "wcs");
+screen("wcs", "I", 14.511263 , "wcs");
+screen("wcs", "I", 14.861263 , "wcs");
+outputvalue("tran2", 14.861263);
+#xgoal tran2   n 0  epsx_n  0   10 0 epsy_n  0   10 0
+screen("wcs", "I", 15.211263 , "wcs");
+screen("wcs", "I", 15.511263 , "wcs");
+screen("wcs", "I", 15.861263 , "wcs");
+screen("wcs", "I", 16.211263 , "wcs");  # s6
+screen("wcs", "I", 16.761212 , "wcs");
+screen("wcs", "I", 16.961212 , "wcs");
+screen("wcs", "I", 17.261212 , "wcs");
+screen("wcs", "I", 17.561212 , "wcs");
+screen("wcs", "I", 17.861212 , "wcs");
+screen("wcs", "I", 18.161212 , "wcs");
+screen("wcs", "I", 18.461212 , "wcs");
+screen("wcs", "I", 18.665632 , "wcs");
+screen("wcs", "I", 18.885632 , "wcs");  # s7
+screen("wcs", "I", 19.384416 , "wcs");
+screen("wcs", "I", 19.684416 , "wcs");
+screen("wcs", "I", 19.984416 , "wcs");
+outputvalue("tran3", 19.984416);
+#xgoal tran3   n 0  epsx_n  0   10 0 epsy_n  0   10 0
+screen("wcs", "I", 20.284416 , "wcs");
+screen("wcs", "I", 20.584416 , "wcs");
+screen("wcs", "I", 20.884416 , "wcs");
+screen("wcs", "I", 21.184416 , "wcs");
+screen("wcs", "I", 21.484416 , "wcs");
+screen("wcs", "I", 21.784416 , "wcs");
+screen("wcs", "I", 22.084416 , "wcs");
+screen("wcs", "I", 22.384416 , "wcs");
+screen("wcs", "I", 22.634416 , "wcs");  # s8
+screen("wcs", "I", 23.186686 , "wcs");
+screen("wcs", "I", 23.486686 , "wcs");
+screen("wcs", "I", 23.786686 , "wcs");
+screen("wcs", "I", 24.086686 , "wcs");
+screen("wcs", "I", 24.386686 , "wcs");
+screen("wcs", "I", 24.636866 , "wcs");
+screen("wcs", "I", 24.796866 , "wcs");
+outputvalue("tran4", 24.796866);
+#xgoal tran4   n 0  epsx_n  0   10 0 epsy_n  0   10 0
+screen("wcs", "I", 25.040666 , "wcs");
+screen("wcs", "I", 25.290666 , "wcs");
+screen("wcs", "I", 25.540666 , "wcs");
+screen("wcs", "I", 25.790666 , "wcs");
+screen("wcs", "I", 25.908266 , "wcs");
+screen("wcs", "I", 26.159435 , "wcs");  # s9
+screen("wcs", "I", 26.711705 , "wcs");
+screen("wcs", "I", 27.011705 , "wcs");
+screen("wcs", "I", 27.311705 , "wcs");
+screen("wcs", "I", 27.611705 , "wcs");
+screen("wcs", "I", 27.911705 , "wcs");
+screen("wcs", "I", 28.211705 , "wcs");
+screen("wcs", "I", 28.511705 , "wcs");
+screen("wcs", "I", 28.811705 , "wcs");
+screen("wcs", "I", 29.111705 , "wcs");
+screen("wcs", "I", 29.411705 , "wcs");
+screen("wcs", "I", 29.679435 , "wcs");  # s10
+outputvalue("tran5", 29.679435);
+#xgoal tran5   n 0  epsx_n  0   10 0 epsy_n  0   10 0
+screen("wcs", "I", 30.181705 , "wcs");
+screen("wcs", "I", 30.431705 , "wcs");
+screen("wcs", "I", 30.681705 , "wcs");
+screen("wcs", "I", 30.931705 , "wcs");
+screen("wcs", "I", 31.181705 , "wcs");
+screen("wcs", "I", 31.431705 , "wcs");
+screen("wcs", "I", 31.681705 , "wcs");
+screen("wcs", "I", 31.931705 , "wcs");
+screen("wcs", "I", 32.181705 , "wcs");
+screen("wcs", "I", 32.431705 , "wcs");
+screen("wcs", "I", 32.681705 , "wcs");
+screen("wcs", "I", 32.931705 , "wcs");
+screen("wcs", "I", 33.204435 , "wcs");  # s11
+screen("wcs", "I", 33.554670 , "wcs");
+screen("wcs", "I", 33.804670 , "wcs");
+screen("wcs", "I", 34.054670 , "wcs");
+screen("wcs", "I", 34.304670 , "wcs");
+screen("wcs", "I", 34.554670 , "wcs");
+screen("wcs", "I", 34.804670 , "wcs");
+outputvalue("tran1", 9.943398);
+#xgoal tran1   n 0  epsx_n  0   10 0 epsy_n  0   10 0
+screen("wcs", "I", 35.054670 , "wcs");
+screen("wcs", "I", 35.304670 , "wcs");
+screen("wcs", "I", 35.554670 , "wcs");
+outputvalue("w700", 35.804670 );
+#xgoal w700   n 0  sigma_l  0.045   10 0 
+#xgoal w700   n 0  ener  1.6e6   1e-8 0 
+screen("wcs", "I", 35.804670 , "wcs");
+screen("wcs", "I", 35.978670 , "wcs");  # c0
+
+screen("wcs", "I", 36.359670 , "wcs");
+screen("wcs", "I", 36.685124 , "wcs");  # s12
+screen("wcs", "I", 36.808124 , "wcs");  # q0
+screen("wcs", "I", 37.180780 , "wcs");
+screen("wcs", "I", 37.505780 , "wcs");
+outputvalue("aw700", 37.805780 );
+#xgoal aw700   n 0  sigma_l  0.045   10 0 
+#xgoal aw700   n 0  ener  1.6e6   1e-8 0 
+#xgoal aw700   n 0  coolsigma  0.00   10  0
+screen("wcs", "I", 37.805780 , "wcs");
+screen("wcs", "I", 38.105780 , "wcs");  # b0
+screen("ccs1", "I", 38.705780 , "ccs1");
+screen("ccs1", "I", 39.005780 , "ccs1");
+screen("ccs1", "I", 39.370780 , "ccs1");  # s13
+screen("ccs1", "I", 39.905780 , "ccs1");
+screen("ccs1", "I", 40.205780 , "ccs1");
+screen("ccs1", "I", 40.505780 , "ccs1");
+screen("ccs1", "I", 40.505780 , "ccs1");
+screen("ccs1", "I", 40.805780 , "ccs1");
+screen("ccs1", "I", 41.105780 , "ccs1");
+outputvalue("dog0", 40.139435  );
+#xgoal dog0   n 0  envx  0.0043   10 0 
+#xgoal dog0   n 0  envy  0.0043   10 0
+#xgoal dog0   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs1", "I", 40.139435 , "ccs1");
+screen("ccs1", "I", 41.470780 , "ccs1");  # s14
+screen("ccs1", "I", 42.005780 , "ccs1");
+outputvalue("dog1", 42.239435  );
+#xgoal dog1   n 0  envx  0.0043   10 0 
+#xgoal dog1   n 0  envy  0.0043   10 0
+#xgoal dog1   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs1", "I", 42.239435 , "ccs1");
+screen("ccs1", "I", 42.305780 , "ccs1");
+screen("ccs1", "I", 42.605780 , "ccs1");  # b1
+screen("ccs2", "I", 43.305780 , "ccs2");
+screen("ccs2", "I", 43.555780 , "ccs2");
+screen("ccs2", "I", 43.739168 , "ccs2");  # q1
+screen("ccs2", "I", 43.839168 , "ccs2");  # s15
+screen("ccs2", "I", 44.462072 , "ccs2");
+
+outputvalue("cool11", 44.949976  );
+#xgoal cool11   n 0  emit4d  0.00     100 0 
+#xgoal cool11   n 0  envx    0.0043   1 1e-4    
+#xgoal cool11   n 0  envy    0.0043   1 1e-4
+#@goal cool11   n 0  orbx    0.00     10 0    orby  0.00   10 0
+screen("ccs2", "I", 44.949976 , "ccs2");
+screen("ccs2", "I", 45.437880 , "ccs2");
+screen("ccs2", "I", 45.925784 , "ccs2");
+screen("ccs2", "I", 46.413688 , "ccs2");
+screen("ccs2", "I", 46.901592 , "ccs2");  # s16
+outputvalue("cool12", 47.489496  );
+#xgoal cool12   n 0  emit4d  0.00     100 0 
+#xgoal cool12   n 0  envx  0.0043   1 1e-4 
+#xgoal cool12   n 0  envy  0.0043   1 1e-4
+#@goal cool12   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs2", "I", 47.489496 , "ccs2");
+screen("ccs2", "I", 47.977400 , "ccs2");
+screen("ccs2", "I", 48.465304 , "ccs2");
+screen("ccs2", "I", 48.953208 , "ccs2");
+screen("ccs2", "I", 49.441112 , "ccs2");
+screen("ccs2", "I", 49.929016 , "ccs2");  # s17
+screen("ccs2", "I", 50.516920 , "ccs2");
+outputvalue("cool13", 51.004824  );
+#xgoal cool13   n 0  emit4d  0.00     100 0 
+#xgoal cool13   n 0  envx  0.0043   1 1e-4 
+#xgoal cool13   n 0  envy  0.0043   1 1e-4
+#@goal cool13   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs2", "I", 51.004824 , "ccs2");
+screen("ccs2", "I", 51.492728 , "ccs2");
+screen("ccs2", "I", 51.980632 , "ccs2");
+screen("ccs2", "I", 52.468536 , "ccs2");
+screen("ccs2", "I", 52.956440 , "ccs2");  # s18
+screen("ccs2", "I", 53.644344 , "ccs2");
+outputvalue("cool14", 54.032248  );
+#xgoal cool14   n 0  emit4d  0.00     100 0 
+#xgoal cool14   n 0  envx  0.0043   1 1e-4 
+#xgoal cool14   n 0  envy  0.0043   1 1e-4
+#xgoal cool14   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs2", "I", 54.032248 , "ccs2");
+screen("ccs2", "I", 54.520152 , "ccs2");
+screen("ccs2", "I", 55.008056 , "ccs2");
+screen("ccs2", "I", 55.495960 , "ccs2");
+screen("ccs2", "I", 55.983864 , "ccs2");  # s19
+screen("ccs2", "I", 56.571768 , "ccs2");
+screen("ccs2", "I", 57.059672 , "ccs2");
+screen("ccs2", "I", 57.547576 , "ccs2");
+outputvalue("cool15", 58.035480  );
+#xgoal cool15   n 0  emit4d  0.00     100 0 
+#xgoal cool15   n 0  envx  0.0043   1 1e-4 
+#xgoal cool15   n 0  envy  0.0043   1 1e-4
+#xgoal cool15   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs2", "I", 58.035480 , "ccs2");
+screen("ccs2", "I", 58.523384 , "ccs2");
+screen("ccs2", "I", 59.011288 , "ccs2");  # s20
+screen("ccs2", "I", 59.599192 , "ccs2");
+screen("ccs2", "I", 60.087096 , "ccs2");
+outputvalue("cool16", 60.575000  );
+#xgoal cool16   n 0  emit4d  0.00     100 0 
+#xgoal cool16   n 0  envx  0.0043   1 1e-4 
+#xgoal cool16   n 0  envy  0.0043   1 1e-4
+#xgoal cool16   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs2", "I", 60.575000 , "ccs2");
+screen("ccs2", "I", 61.062904 , "ccs2");
+screen("ccs2", "I", 61.550808 , "ccs2");
+screen("ccs2", "I", 62.038712 , "ccs2");  # s21
+screen("ccs2", "I", 62.626616 , "ccs2");
+screen("ccs2", "I", 63.114520 , "ccs2");
+screen("ccs2", "I", 63.602424 , "ccs2");
+screen("ccs2", "I", 64.090328 , "ccs2");
+outputvalue("cool17", 64.578232  );
+#xgoal cool17   n 0  emit4d  0.00     100 0 
+#xgoal cool17   n 0  envx  0.0043   1 1e-4 
+#xgoal cool17   n 0  envy  0.0043   1 1e-4
+#xgoal cool17   n 0  coolsigma  0.00   10  0
+screen("ccs2", "I", 64.578232 , "ccs2");
+screen("ccs2", "I", 65.049646 , "ccs2");  # s22
+screen("ccs2", "I", 65.499646 , "ccs2");
+screen("ccs2", "I", 65.799646 , "ccs2");  # q2
+screen("ccs2", "I", 65.982816 , "ccs2");  # b2
+screen("ccs3", "I", 66.253810 , "ccs3");  # d205
+#screen("ccs3", "I", 66.603810 , "ccs3");
+screen("ccs3", "I", 66.953810 , "ccs3");  # d207
+screen("ccs3", "I", 67.525224 , "ccs3");
+screen("ccs3", "I", 68.013128 , "ccs3");
+screen("ccs3", "I", 68.501032 , "ccs3");
+outputvalue("cool21", 68.988936  );
+#xgoal cool21   n 0  envx  0.0043   10 0 
+#xgoal cool21   n 0  envy  0.0043   10 0
+#xgoal cool21   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs3", "I", 68.988936 , "ccs3");
+screen("ccs3", "I", 69.476840 , "ccs3");
+screen("ccs3", "I", 69.964744 , "ccs3");  # d213
+screen("ccs3", "I", 70.552648 , "ccs3");
+screen("ccs3", "I", 71.040552 , "ccs3");
+screen("ccs3", "I", 71.528456 , "ccs3");
+outputvalue("cool22", 72.016360  );
+#xgoal cool22   n 0  envx  0.0043   10 0 
+#xgoal cool22   n 0  envy  0.0043   10 0
+#xgoal cool22   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs3", "I", 72.016360 , "ccs3");
+screen("ccs3", "I", 72.504264 , "ccs3");
+screen("ccs3", "I", 72.992168 , "ccs3");  # d219
+screen("ccs3", "I", 73.580072 , "ccs3");
+screen("ccs3", "I", 74.067976 , "ccs3");
+outputvalue("cool23", 74.555880  );
+#xgoal cool23   n 0  envx  0.0043   10 0 
+#xgoal cool23   n 0  envy  0.0043   10 0
+#xgoal cool23   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs3", "I", 74.555880 , "ccs3");
+screen("ccs3", "I", 75.043784 , "ccs3");
+screen("ccs3", "I", 75.531688 , "ccs3");
+screen("ccs3", "I", 76.019592 , "ccs3");  # d225
+screen("ccs3", "I", 76.607496 , "ccs3");
+outputvalue("cool24", 74.555880  );
+#xgoal cool24   n 0  envx  0.0043   10 0 
+#xgoal cool24   n 0  envy  0.0043   10 0
+#xgoal cool24   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs3", "I", 77.095400 , "ccs3");
+screen("ccs3", "I", 77.583304 , "ccs3");
+screen("ccs3", "I", 78.071208 , "ccs3");
+screen("ccs3", "I", 78.559112 , "ccs3");
+screen("ccs3", "I", 79.047016 , "ccs3");  # d231
+screen("ccs3", "I", 79.634920 , "ccs3");
+outputvalue("cool25", 80.122824  );
+#xgoal cool25   n 0  envx  0.0043   10 0 
+#xgoal cool25   n 0  envy  0.0043   10 0
+#xgoal cool25   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs3", "I", 80.122824 , "ccs3");
+screen("ccs3", "I", 80.610728 , "ccs3");
+screen("ccs3", "I", 81.098632 , "ccs3");
+screen("ccs3", "I", 81.586536 , "ccs3");
+screen("ccs3", "I", 82.074440 , "ccs3");  # d237
+screen("ccs3", "I", 82.662344 , "ccs3");
+screen("ccs3", "I", 83.150248 , "ccs3");
+outputvalue("cool26", 83.638152  );
+#xgoal cool26   n 0  envx  0.0043   10 0 
+#xgoal cool26   n 0  envy  0.0043   10 0
+#xgoal cool26   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs3", "I", 83.638152 , "ccs3");
+screen("ccs3", "I", 84.126056 , "ccs3");
+screen("ccs3", "I", 84.613960 , "ccs3");
+screen("ccs3", "I", 85.101864 , "ccs3");  # d243
+screen("ccs3", "I", 85.689768 , "ccs3");
+screen("ccs3", "I", 86.177672 , "ccs3");
+outputvalue("cool27", 86.665576  );
+#xgoal cool27   n 0  envx  0.0043   10 0 
+#xgoal cool27   n 0  envy  0.0043   10 0
+#xgoal cool27   n 0  orbx  0.00   10 0 orby  0.00   10 0
+screen("ccs3", "I", 86.665576 , "ccs3");
+screen("ccs3", "I", 87.153480 , "ccs3");
+screen("ccs3", "I", 87.641384 , "ccs3");
+screen("ccs3", "I", 88.129288 , "ccs3");  # d249
+screen("ccs3", "I", 88.729288 , "ccs3");
+screen("ccs3", "I", 89.247676 , "ccs3");  # d251
+screen("ccs4", "I", 89.847676 , "ccs4");
+screen("ccs4", "I", 90.147676 , "ccs4");
+screen("ccs4", "I", 90.447676 , "ccs4");  # d254
+screen("ccs4", "I", 91.047676 , "ccs4");
+screen("ccs4", "I", 91.347676 , "ccs4");
+screen("ccs4", "I", 91.647676 , "ccs4");
+screen("ccs4", "I", 91.947676 , "ccs4");
+screen("ccs4", "I", 92.247676 , "ccs4");
+screen("ccs4", "I", 92.547676 , "ccs4");  # d260
+screen("ccs4", "I", 93.147676 , "ccs4");
+screen("ccs4", "I", 93.447676 , "ccs4");
+screen("ccs4", "I", 93.747676 , "ccs4");  # d263
+screen("ccs5", "I", 94.547676 , "ccs5");
+screen("ccs5", "I", 95.047676 , "ccs5");
+screen("ccs5", "I", 95.547676 , "ccs5");
+screen("ccs5", "I", 96.047676 , "ccs5");
+screen("ccs5", "I", 96.547676 , "ccs5");
+screen("ccs5", "I", 97.047676 , "ccs5");
+screen("ccs5", "I", 97.571676 , "ccs5");  # 
+}
+#-----------------------------------------------------------------------
+
+
+
+saveTime0 = 5.86e-10 ;   # save after cathode 
+saveTime1 = 1.45e-08 ;   # Absolute maximum time until after 3rd
+saveTime2 = 3.50e-08 ;   # after t1 t2 t3
+saveTime3 = 7.50e-08 ;   # after t4 t5 t6
+saveTime4 = 1.22e-07 ;   # save before 700w
+#saveTime4 = 1.31e-07 ;   # save after 700w
+saveTime5 = 1.85e-07 ;   # save after dogleg
+saveTime6 = 2.26e-07 ;   # save before uturn
+saveTime7 = 2.40e-07 ;   # save after uturn
+saveTime8 = 3.45e-07 ;   # Absolute maximum time, it should not take any longer
+
+
+
+if(section == -1) {		#single particle
+	Npart=1;
+	space_charge = 0;
+	setparticles("beam", Npart, me, qe, total_charge);
+
+	setxoffset("beam",0.000);
+	setyoffset("beam",0.000);
+
+	setGdist( "beam", "u", Gamma, 0); 	# gamma define on top
+	saveTime = 3.45e-7; # Absolute maximum time, it should not take any longer
+	saveTime = 2.00e-7 ;   # save after 700w
+	dtout = 2.0e-10;
+	tout(0,saveTime,dtout);
+
+} else if(section == 0) {
+	setparticles("beam", Npart, me, qe, total_charge);
+
+	R = 2.0000000000e-03;
+	setrxydist("beam","u", R/2, R);
+	setphidist("beam","u", 0,2*pi);
+    
+	Toff = 0.0;
+	Tlength = 80.0e-12;  # +- 10 degrees
+	#Tlength = 10 * 2. /360./ 703.75e6;  # yes 80 ps
+	settdist("beam","u",Toff,Tlength);
+	setGdist( "beam", "u", Gamma, 0);
+
+	kT = 0.13;
+	sigmagb = sqrt(kT/mc2);
+	en = (R/2)*sigmagb;
+	#                     center, sigma, leftcutoff, rightcutoff
+	setGBxdist("beam","g",0,sigmagb,5,5);
+	setGBydist("beam","g",0,sigmagb,5,5);
+
+	setxoffset("beam",0.000);
+	setyoffset("beam",0.000);
+
+	saveTime =  saveTime0 ;   # save after cathode 
+} else if(section == 1) {
+	timesetfile("beam", "outgpt.out00", saveTime0 );
+	saveTime = saveTime1 ;   # Absolute maximum time until after 3rd
+} else if(section == 2) {
+	timesetfile("beam", "outgpt.out01", saveTime1 );
+	saveTime = saveTime2 ;   # after t1 t2 t3
+} else if(section == 3) {
+	timesetfile("beam", "outgpt.out02", saveTime2 );
+	saveTime = saveTime3 ;   # after t4 t5 t6
+} else if(section == 4) {
+	timesetfile("beam", "outgpt.out03", saveTime3 );
+	saveTime = saveTime4 ;   # save before 700w
+} else if(section == 5) {
+	timesetfile("beam", "outgpt.out04", saveTime4 );
+	saveTime = saveTime5 ;   # save after dogleg
+	#saveTime = 1.31e-07 ;   # save after 700w
+    	#onAxis("wcs", "z", 38.200000 , "beam", 10);
+} else if(section == 6) {
+	timesetfile("beam", "outgpt.out05", saveTime5 );
+	saveTime = saveTime6 ;   # save before uturn
+	ccsflip("wcs", "I", "ccs2");
+} else if(section == 7) {
+	timesetfile("beam", "outgpt.out06", saveTime6 );
+	saveTime = saveTime7 ;   # Absolute maximum time, it should not take any longer
+	ccsflip("wcs", "I", "ccs2");
+} else if(section == 8) {
+	timesetfile("beam", "outgpt.out07", saveTime7 );
+	saveTime = saveTime8 ;   # Absolute maximum time, it should not take any longer
+	ccsflip("wcs", "I", "ccs2");
+}
+
+
+tmax = saveTime+1e-10;
+tout(saveTime);   
+outputvalue("Npart", Npart);
+
+#dtout = 2.0e-10;
+#tout(0,tmax,dtout);
+
+
+#--------------------------------------------------------------------------
+# Spacecharge Parameters
+#--------------------------------------------------------------------------
+
+if (space_charge == 1) {
+    if (space_charge_type == 0) {
+	setcharge2Dcircle("beam", total_charge);
+        spacecharge2Dcircle();
+    }
+    if (space_charge_type == 1) {
+	if(section  == 0)
+        	spacecharge3Dmesh("Cathode", "MeshNfac", Alpha, "MeshAdapt", Fn, "SolverAcc", verror, "MeshBoxSize", Nstd);
+        	#spacecharge3Dmesh("Cathode", "MeshNbunch", 16, 16, 64, "SolverAcc", verror);
+	else
+        	spacecharge3Dmesh("MeshNfac", Alpha, "MeshAdapt", Fn, "SolverAcc", verror, "MeshBoxSize", Nstd);
+    }
+}
+
+
+
+#--------------------------------------------------------------------------
+# OUTPUT PARAMETERS
+#--------------------------------------------------------------------------
+ZSTART = -0.005;
+#ZSTOP = 40.15;
+ZSTOP = 85.15;
+#ZSTOP = 12.15;
+#zminmax("wcs","I",ZSTART,ZSTOP);
+
+
+
+
+

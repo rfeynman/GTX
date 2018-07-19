@@ -1,0 +1,43 @@
+# This file has been generated automatically
+
+ELEMSRCS = \
+  catdog.c \
+  catleg.c \
+  onAxis.c \
+  timesetfile.c \
+  ionizer.c \
+  multirmax.c \
+  cathode.c \
+  csol.c \
+  kasten.c \
+  myquad.c \
+  dogleg.c \
+  uturn.c \
+  map3D3Sym_B.c \
+  sectormagnet_fix.c \
+  boxsolenoid.c \
+  GBzmin.c \
+  setyoffset.c \
+  setxoffset.c \
+  
+
+ELEMOBJS = \
+  catdog.obj \
+  catleg.obj \
+  onAxis.obj \
+  timesetfile.obj \
+  ionizer.obj \
+  multirmax.obj \
+  cathode.obj \
+  csol.obj \
+  kasten.obj \
+  myquad.obj \
+  dogleg.obj \
+  uturn.obj \
+  map3D3Sym_B.obj \
+  sectormagnet_fix.obj \
+  boxsolenoid.obj \
+  GBzmin.obj \
+  setyoffset.obj \
+  setxoffset.obj \
+  
